@@ -8,7 +8,7 @@
 * Numpy
 * cat vs dog images [here](https://www.kaggle.com/c/dogs-vs-cats-redux-kernels-edition/data)
 
-## Useage 
+## Usage 
 * image_generator: it can  generate imageurl  from your image file.  
 
     **example:**
