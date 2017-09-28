@@ -1,6 +1,6 @@
 # tensorflow_alexnet_classify
-> This repository aim to implement a alexnet with tensorflow . it give a pretrain weight (bvlc_alexnet.npy), you can download from 
-[here](http://www.cs.toronto.edu/~guerzhoy/tf_alexnet/).the train file contain 25000 images (cat and dog). 
+> This repository aims to implement a alexnet with tensorflow . it gives a pretrain weight (bvlc_alexnet.npy), you can download from 
+[here](http://www.cs.toronto.edu/~guerzhoy/tf_alexnet/).the train file contains 25000 images (cat and dog). 
 
 ## Requirements
 * Python 3.5 (Didn't test but should run under 2.7 as well)

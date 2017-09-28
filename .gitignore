@@ -1,4 +1,6 @@
 *.npy
 **/*.pyc
 .idea
-
+test/
+tmp/
+train/
