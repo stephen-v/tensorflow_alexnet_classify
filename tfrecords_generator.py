@@ -8,9 +8,8 @@ example:  key: path/to/your/images  value: 0
 class TFRecordsGenerator(object):
     def __init__(self, url_map, out_path):
         """
-          Args
-              url_map:
-              out_path:output path for tfrecords
+        :param url_map:
+        :param out_path
         """
         self.url_map = url_map
         self.out_path = out_path
@@ -24,5 +23,6 @@ class TFRecordsGenerator(object):
     def read_records(self,batch_size):
         """
         read records from out_path
+        :param batch_size:
         :return:image_batch, label_batch
         """
