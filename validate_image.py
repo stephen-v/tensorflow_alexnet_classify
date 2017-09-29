@@ -18,6 +18,7 @@ def test_image(path_image, num_class, weights_path='Default'):
         sess.run(tf.global_variables_initializer())
         saver.restore(sess, "./tmp/checkpoints/model_epoch4.ckpt")
         # score = model.fc8
+        print(sess.run(model.fc8))
         prob = sess.run(max)[0]
         plt.imshow(img_decoded.eval())
         plt.title("Class:" + class_name[prob])
@@ -25,4 +26,5 @@ def test_image(path_image, num_class, weights_path='Default'):
         plt.waitforbuttonpress()
 
 
-test_image('./test/4.jpg', num_class=2)
+test_image('./test/50.jpg', num_class=2)
+
