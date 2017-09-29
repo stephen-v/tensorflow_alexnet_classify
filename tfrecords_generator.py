@@ -15,13 +15,14 @@ class TFRecordsGenerator(object):
         self.url_map = url_map
         self.out_path = out_path
 
-    """
-    generate tfrecord 
-    
-    """
-
     def generate(self):
         """
         start to generate tfrecords from url_map
         :return:
+        """
+
+    def read_records(self,batch_size):
+        """
+        read records from out_path
+        :return:image_batch, label_batch
         """
