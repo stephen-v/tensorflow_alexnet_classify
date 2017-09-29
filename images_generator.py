@@ -22,3 +22,5 @@ class ImagesGenerator():
 
     def toList(self):
         return self.image_path, self.label_path
+
+ImagesGenerator().toList()
