@@ -84,7 +84,7 @@ train_batches_per_epoch = int(np.floor(tr_data.data_size / batch_size))
 with tf.Session() as sess:
     # Initialize all variables
     sess.run(tf.global_variables_initializer())
-    sess.run(iterator.make_initializer(tr_data.data))
+
     # Add the model graph to TensorBoard
     writer.add_graph(sess.graph)
     # Load the pretrained weights into the non-trainable layer
@@ -95,8 +95,8 @@ with tf.Session() as sess:
 
     # Loop over number of epochs
     for epoch in range(num_epochs):
-
-        print("{} Epoch number: {} Start".format(datetime.now(), epoch + 1))
+        sess.run(iterator.make_initializer(tr_data.data))
+        print("{} Epoch number: {} start".format(datetime.now(), epoch + 1))
 
         for step in range(train_batches_per_epoch):
             img_batch, label_batch = sess.run(next_batch)
@@ -116,4 +116,4 @@ with tf.Session() as sess:
         checkpoint_name = os.path.join(checkpoint_path,
                                        'model_epoch' + str(epoch + 1) + '.ckpt')
         save_path = saver.save(sess, checkpoint_name)
-        print("{} Epoch number: {} End".format(datetime.now(), epoch + 1))
+        print("{} Epoch number: {} end".format(datetime.now(), epoch + 1))
