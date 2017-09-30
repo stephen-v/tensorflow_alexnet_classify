@@ -17,7 +17,7 @@ def add_images(image_sets, classify, images):
 
 
 add_images(image_filenames_cat, 0, images)
-add_images(image_filenames_dog, 0, images)
+add_images(image_filenames_dog, 1, images)
 
 tf_generator = TFRecordsGenerator(images, './tfrecords')
 tf_generator.generate([227, 227])

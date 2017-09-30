@@ -30,16 +30,17 @@ class TFRecordsGenerator(object):
                 image_url = image['image_path']
                 record_filename = "{path}/{current_index}.tfrecords".format(path=self.out_path,
                                                                             current_index=current_i)
-                writer = tf.python_io.TFRecordWriter(record_filename)
-                image_stream = tf.read_file(image_url)
                 try:
+                    writer = tf.python_io.TFRecordWriter(record_filename)
+                    image_stream = tf.read_file(image_url)
                     image_raw = tf.image.decode_jpeg(image_stream, channels=3)
+                    image_raw = tf.image.resize_images(image_raw, size=size)
+                    resized_image = sess.run(tf.cast(image_raw, tf.uint8)).tobytes()
+                    image_lable = sess.run(tf.cast(image['type'],tf.uint8)).tobytes()
+
                 except:
                     print(image_url)
                     continue
-                image_raw = tf.image.resize_images(image_raw, size=size)
-                resized_image = sess.run(tf.cast(image_raw, tf.uint8)).tobytes()
-                image_lable = image['type']
                 example = tf.train.Example(features=tf.train.Features(feature={
                     'label': tf.train.Feature(bytes_list=tf.train.BytesList(value=[image_lable])),
                     'image': tf.train.Feature(bytes_list=tf.train.BytesList(value=[resized_image]))
