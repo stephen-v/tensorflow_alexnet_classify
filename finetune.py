@@ -109,10 +109,24 @@ with tf.Session() as sess:
                                                         keep_prob: 1.})
 
                 writer.add_summary(s, epoch * train_batches_per_epoch + step)
-                acc = sess.run(accuracy, feed_dict={x: img_batch,
-                                                    y: label_batch,
-                                                    keep_prob: 1.})
-                print('current acc=' + str(acc))
+
+        print("{} Start validation".format(datetime.now()))
+        sess.run(iterator.make_initializer(tr_data.data))
+        test_acc = 0.
+        test_count = 0
+        for _ in range(train_batches_per_epoch):
+            img_batch, label_batch = sess.run(next_batch)
+            acc = sess.run(accuracy, feed_dict={x: img_batch,
+                                                y: label_batch,
+                                                keep_prob: 1.})
+            test_acc += acc
+            test_count += 1
+        test_acc /= test_count
+
+        print("{} Validation Accuracy = {:.4f}".format(datetime.now(), test_acc))
+
+        print("{} Saving checkpoint of model...".format(datetime.now()))
+
         checkpoint_name = os.path.join(checkpoint_path,
                                        'model_epoch' + str(epoch + 1) + '.ckpt')
         save_path = saver.save(sess, checkpoint_name)

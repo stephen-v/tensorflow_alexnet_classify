@@ -43,4 +43,3 @@ class ImageDataGenerator(object):
         img_decoded = tf.image.decode_png(img_string, channels=3)
         img_resized = tf.image.resize_images(img_decoded, [227, 227])
         return img_resized, one_hot
-
