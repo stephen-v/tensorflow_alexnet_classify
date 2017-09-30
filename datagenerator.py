@@ -5,6 +5,9 @@ from tensorflow.python.framework import dtypes
 from tensorflow.python.framework.ops import convert_to_tensor
 from tensorflow.contrib.data import Dataset
 
+VGG_MEAN = tf.constant([123.68, 116.779, 103.939], dtype=tf.float32)
+
+
 class ImageDataGenerator(object):
     def __init__(self, images, labels, batch_size, num_classes, shuffle=True,
                  buffer_size=1000):
@@ -42,4 +45,6 @@ class ImageDataGenerator(object):
         img_string = tf.read_file(filename)
         img_decoded = tf.image.decode_png(img_string, channels=3)
         img_resized = tf.image.resize_images(img_decoded, [227, 227])
-        return img_resized, one_hot
+        img_centered = tf.subtract(img_resized, VGG_MEAN)
+        img_bgr = img_centered[:, :, ::-1]
+        return img_bgr, one_hot
