@@ -28,7 +28,6 @@ class ImageDataGenerator(object):
         self.data = data
 
     def _shuffle_lists(self):
-        """Conjoined shuffling of the list of paths and labels."""
         path = self.img_paths
         labels = self.labels
         permutation = np.random.permutation(self.data_size)
@@ -39,10 +38,7 @@ class ImageDataGenerator(object):
             self.labels.append(labels[i])
 
     def _parse_function_train(self, filename, label):
-        """Input parser for samples of the training set."""
-        # convert label number into one-hot-encoding
         one_hot = tf.one_hot(label, self.num_classes)
-        # load and preprocess the image
         img_string = tf.read_file(filename)
         img_decoded = tf.image.decode_png(img_string, channels=3)
         img_resized = tf.image.resize_images(img_decoded, [227, 227])
