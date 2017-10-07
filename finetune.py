@@ -41,7 +41,6 @@ for dogitem in image_filenames_dog:
     image_path.append(dogitem)
     label_path.append(1)
 
-
 tr_data = ImageDataGenerator(
     images=image_path,
     labels=label_path,
