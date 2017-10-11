@@ -1,26 +1,3 @@
-"""This is an TensorFLow implementation of AlexNet by Alex Krizhevsky at all.
-
-Paper:
-(http://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks.pdf)
-
-Explanation can be found in my blog post:
-https://kratzert.github.io/2017/02/24/finetuning-alexnet-with-tensorflow.html
-
-This script enables finetuning AlexNet on any given Dataset with any number of
-classes. The structure of this script is strongly inspired by the fast.ai
-Deep Learning class by Jeremy Howard and Rachel Thomas, especially their vgg16
-finetuning script:
-Link:
-- https://github.com/fastai/courses/blob/master/deeplearning1/nbs/vgg16.py
-
-
-The pretrained weights can be downloaded here and should be placed in the same
-folder as this file:
-- http://www.cs.toronto.edu/~guerzhoy/tf_alexnet/
-
-@author: Frederik Kratzert (contact: f.kratzert(at)gmail.com)
-"""
-
 import tensorflow as tf
 import numpy as np
 
@@ -57,6 +34,7 @@ class AlexNet(object):
 
     def create(self):
         """Create the network graph."""
+
         # 1st Layer: Conv (w ReLu) -> Lrn -> Pool
         conv1 = conv(self.X, 11, 11, 96, 4, 4, padding='VALID', name='conv1')
         norm1 = lrn(conv1, 2, 2e-05, 0.75, name='norm1')
@@ -90,13 +68,8 @@ class AlexNet(object):
         self.fc8 = fc(dropout7, 4096, self.NUM_CLASSES, relu=False, name='fc8')
 
     def load_initial_weights(self, session):
-        """Load weights from file into network.
+        """Load weights from file into network."""
 
-        As the weights from http://www.cs.toronto.edu/~guerzhoy/tf_alexnet/
-        come as a dict of lists (e.g. weights['conv1'] is a list) and not as
-        dict of dicts (e.g. weights['conv1'] is a dict with keys 'weights' &
-        'biases') we need a special load function
-        """
         # Load the weights into memory
         weights_dict = np.load(self.WEIGHTS_PATH, encoding='bytes').item()
 
@@ -124,10 +97,8 @@ class AlexNet(object):
 
 def conv(x, filter_height, filter_width, num_filters, stride_y, stride_x, name,
          padding='SAME', groups=1):
-    """Create a convolution layer.
+    """Create a convolution layer."""
 
-    Adapted from: https://github.com/ethereon/caffe-tensorflow
-    """
     # Get number of input channels
     input_channels = int(x.get_shape()[-1])
 
@@ -169,6 +140,7 @@ def conv(x, filter_height, filter_width, num_filters, stride_y, stride_x, name,
 
 def fc(x, num_in, num_out, name, relu=True):
     """Create a fully connected layer."""
+
     with tf.variable_scope(name) as scope:
 
         # Create tf variables for the weights and biases
@@ -190,6 +162,7 @@ def fc(x, num_in, num_out, name, relu=True):
 def max_pool(x, filter_height, filter_width, stride_y, stride_x, name,
              padding='SAME'):
     """Create a max pooling layer."""
+
     return tf.nn.max_pool(x, ksize=[1, filter_height, filter_width, 1],
                           strides=[1, stride_y, stride_x, 1],
                           padding=padding, name=name)
@@ -197,6 +170,7 @@ def max_pool(x, filter_height, filter_width, stride_y, stride_x, name,
 
 def lrn(x, radius, alpha, beta, name, bias=1.0):
     """Create a local response normalization layer."""
+
     return tf.nn.local_response_normalization(x, depth_radius=radius,
                                               alpha=alpha, beta=beta,
                                               bias=bias, name=name)
@@ -204,4 +178,5 @@ def lrn(x, radius, alpha, beta, name, bias=1.0):
 
 def dropout(x, keep_prob):
     """Create a dropout layer."""
+
     return tf.nn.dropout(x, keep_prob)
