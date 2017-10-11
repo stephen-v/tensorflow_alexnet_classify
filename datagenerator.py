@@ -8,6 +8,7 @@ from tensorflow.contrib.data import Dataset
 VGG_MEAN = tf.constant([123.68, 116.779, 103.939], dtype=tf.float32)
 
 
+# 把图片数据转化为三维矩阵
 class ImageDataGenerator(object):
     def __init__(self, images, labels, batch_size, num_classes, shuffle=True,
                  buffer_size=1000):
@@ -20,6 +21,7 @@ class ImageDataGenerator(object):
 
         if shuffle:
             self._shuffle_lists()
+
         self.img_paths = convert_to_tensor(self.img_paths, dtype=dtypes.string)
         self.labels = convert_to_tensor(self.labels, dtype=dtypes.int32)
         data = Dataset.from_tensor_slices((self.img_paths, self.labels))
@@ -30,6 +32,7 @@ class ImageDataGenerator(object):
 
         self.data = data
 
+    # 打乱图片顺序
     def _shuffle_lists(self):
         path = self.img_paths
         labels = self.labels
@@ -40,6 +43,7 @@ class ImageDataGenerator(object):
             self.img_paths.append(path[i])
             self.labels.append(labels[i])
 
+    # 把图片生成三维数组，以及把标签转化为向量
     def _parse_function_train(self, filename, label):
         one_hot = tf.one_hot(label, self.num_classes)
         img_string = tf.read_file(filename)
