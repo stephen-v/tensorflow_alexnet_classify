@@ -91,14 +91,24 @@ keep_prob = tf.placeholder(tf.float32)
 # 图片数据通过AlexNet网络处理
 model = AlexNet(x, keep_prob, num_classes, train_layers)
 
+# List of trainable variables of the layers we want to train
+var_list = [v for v in tf.trainable_variables() if v.name.split('/')[0] in train_layers]
+
 # 执行整个网络图
 score = model.fc8
 
 # 损失函数
 loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=score,
                                                               labels=y))
+
+gradients = tf.gradients(loss, var_list)
+
+gradients = list(zip(gradients, var_list))
+
 # 优化器，采用梯度下降算法进行优化
-optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(loss)
+optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+
+train_op = optimizer.apply_gradients(grads_and_vars=gradients)
 
 tf.summary.scalar('cross_entropy', loss)
 
@@ -138,7 +148,7 @@ with tf.Session() as sess:
         #开始训练每一代
         for step in range(train_batches_per_epoch):
             img_batch, label_batch = sess.run(next_batch)
-            sess.run(optimizer, feed_dict={x: img_batch,
+            sess.run(train_op, feed_dict={x: img_batch,
                                            y: label_batch,
                                            keep_prob: dropout_rate})
             if step % display_step == 0:
@@ -158,7 +168,7 @@ with tf.Session() as sess:
             img_batch, label_batch = sess.run(next_batch)
             acc = sess.run(accuracy, feed_dict={x: img_batch,
                                                 y: label_batch,
-                                                keep_prob: 1.})
+                                                keep_prob: 1.0})
             test_acc += acc
             test_count += 1
 
