@@ -12,7 +12,7 @@ import glob
 from tensorflow.contrib.data import Iterator
 
 learning_rate = 1e-4
-num_epochs = 10  # 代的个数
+num_epochs = 20  # 代的个数
 batch_size = 128
 dropout_rate = 0.5
 num_classes = 2  # 类别标签
@@ -26,16 +26,16 @@ if not os.path.isdir(checkpoint_path):
     os.mkdir(checkpoint_path)
 
 train_image_path = 'train/'  # 指定训练集数据路径（根据实际情况指定训练数据集的路径）
-test_image_cat_path = 'test/cat'  # 指定测试集数据路径（根据实际情况指定测试数据集的路径）
-test_image_dog_path = 'test/dog'  # 指定测试集数据路径（根据实际情况指定测试数据集的路径）
+test_image_cat_path = 'test/cat/'  # 指定测试集数据路径（根据实际情况指定测试数据集的路径）
+test_image_dog_path = 'test/dog/'  # 指定测试集数据路径（根据实际情况指定测试数据集的路径）
 
 # 打开训练数据集目录，读取全部图片，生成图片路径列表
 image_filenames_cat = np.array(glob.glob(train_image_path + 'cat.*.jpg'))
 image_filenames_dog = np.array(glob.glob(train_image_path + 'dog.*.jpg'))
 
 # 打开测试数据集目录，读取全部图片，生成图片路径列表
-test_image_filenames_cat = np.array(glob.glob(test_image_cat_path + '/*.jpg'))
-test_image_filenames_dog = np.array(glob.glob(test_image_dog_path + '/*.jpg'))
+test_image_filenames_cat = np.array(glob.glob(test_image_cat_path + '*.jpg'))
+test_image_filenames_dog = np.array(glob.glob(test_image_dog_path + '*.jpg'))
 
 image_path = []
 label_path = []
@@ -72,20 +72,21 @@ test_data = ImageDataGenerator(
     images=test_image,
     labels=test_label,
     batch_size=batch_size,
-    num_classes=num_classes)
-
-x = tf.placeholder(tf.float32, [batch_size, 227, 227, 3])
-y = tf.placeholder(tf.float32, [batch_size, num_classes])
-keep_prob = tf.placeholder(tf.float32)
+    num_classes=num_classes,
+    shuffle=False)
 
 # 定义迭代器
 iterator = Iterator.from_structure(tr_data.data.output_types,
                                    tr_data.data.output_shapes)
-iterator_test = Iterator.from_structure(test_data.data.output_types,
-                                        test_data.data.output_shapes)
 # 定义每次迭代的数据
 next_batch = iterator.get_next()
-next_batch_test = iterator_test.get_next()
+
+training_initalize=iterator.make_initializer(tr_data.data)
+testing_initalize=iterator.make_initializer(test_data.data)
+
+x = tf.placeholder(tf.float32, [batch_size, 227, 227, 3])
+y = tf.placeholder(tf.float32, [batch_size, num_classes])
+keep_prob = tf.placeholder(tf.float32)
 
 # 图片数据通过AlexNet网络处理
 model = AlexNet(x, keep_prob, num_classes, train_layers)
@@ -131,10 +132,10 @@ with tf.Session() as sess:
 
     # 总共训练10代
     for epoch in range(num_epochs):
-        sess.run(iterator.make_initializer(tr_data.data))
+        sess.run(training_initalize)
         print("{} Epoch number: {} start".format(datetime.now(), epoch + 1))
 
-        # 开始训练每一代
+        #开始训练每一代
         for step in range(train_batches_per_epoch):
             img_batch, label_batch = sess.run(next_batch)
             sess.run(optimizer, feed_dict={x: img_batch,
@@ -149,12 +150,12 @@ with tf.Session() as sess:
 
         # 测试模型精确度
         print("{} Start validation".format(datetime.now()))
-        sess.run(iterator.make_initializer(test_data.data))
+        sess.run(testing_initalize)
         test_acc = 0.
         test_count = 0
 
         for _ in range(test_batches_per_epoch):
-            img_batch, label_batch = sess.run(next_batch_test)
+            img_batch, label_batch = sess.run(next_batch)
             acc = sess.run(accuracy, feed_dict={x: img_batch,
                                                 y: label_batch,
                                                 keep_prob: 1.})
