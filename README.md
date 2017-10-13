@@ -23,7 +23,7 @@
     /path/to/train/image4.png 0
 
 ## Notes:
-* The alexnet.py and datagenerator.py files have been builded, you don't have to modify it. But if you have more simple or cerficent codes, please do share them with us.
+* The alexnet.py and datagenerator.py files have been builded, you don't have to modify it. But if you have more concise or effective codes, please do share them with us.
 * finetune.py is aimed to tune the weights and bias in the full connected layer, you must define some varibles,functions,and class numbers according to your distinct projects.  
 
 ## Example output:
