@@ -115,27 +115,28 @@ def conv(x, filter_height, filter_width, num_filters, stride_y, stride_x, name,
                                                     num_filters])
         biases = tf.get_variable('biases', shape=[num_filters])
 
-    if groups == 1:
-        conv = convolve(x, weights)
+        if groups == 1:
+            conv = convolve(x, weights)
 
-    # In the cases of multiple groups, split inputs & weights and
-    else:
-        # Split input and weights and convolve them separately
-        input_groups = tf.split(axis=3, num_or_size_splits=groups, value=x)
-        weight_groups = tf.split(axis=3, num_or_size_splits=groups,
-                                 value=weights)
-        output_groups = [convolve(i, k) for i, k in zip(input_groups, weight_groups)]
+        # In the cases of multiple groups, split inputs & weights and
+        else:
+            # Split input and weights and convolve them separately
+            input_groups = tf.split(axis=3, num_or_size_splits=groups, value=x)
+            weight_groups = tf.split(axis=3, num_or_size_splits=groups,
+                                     value=weights)
+            output_groups = [convolve(i, k) for i, k in zip(input_groups, weight_groups)]
 
-        # Concat the convolved output together again
-        conv = tf.concat(axis=3, values=output_groups)
+            # Concat the convolved output together again
+            conv = tf.concat(axis=3, values=output_groups)
 
-    # Add biases
-    bias = tf.reshape(tf.nn.bias_add(conv, biases), tf.shape(conv))
 
-    # Apply relu function
-    relu = tf.nn.relu(bias, name=scope.name)
+        # Add biases
+        bias = tf.reshape(tf.nn.bias_add(conv, biases), tf.shape(conv))
 
-    return relu
+        # Apply relu function
+        relu = tf.nn.relu(bias, name=scope.name)
+
+        return relu
 
 
 def fc(x, num_in, num_out, name, relu=True):
@@ -151,12 +152,12 @@ def fc(x, num_in, num_out, name, relu=True):
         # Matrix multiply weights and inputs and add bias
         act = tf.nn.xw_plus_b(x, weights, biases, name=scope.name)
 
-    if relu:
-        # Apply ReLu non linearity
-        relu = tf.nn.relu(act)
-        return relu
-    else:
-        return act
+        if relu:
+            # Apply ReLu non linearity
+            relu = tf.nn.relu(act)
+            return relu
+        else:
+            return act
 
 
 def max_pool(x, filter_height, filter_width, stride_y, stride_x, name,

@@ -12,8 +12,8 @@ import glob
 from tensorflow.contrib.data import Iterator
 
 learning_rate = 1e-4
-num_epochs = 20  # 代的个数
-batch_size = 128
+num_epochs = 100  # 代的个数
+batch_size = 1024
 dropout_rate = 0.5
 num_classes = 2  # 类别标签
 train_layers = ['fc8', 'fc7', 'fc6']
@@ -74,15 +74,15 @@ test_data = ImageDataGenerator(
     batch_size=batch_size,
     num_classes=num_classes,
     shuffle=False)
-
-# 定义迭代器
-iterator = Iterator.from_structure(tr_data.data.output_types,
+with tf.name_scope('input'):
+    # 定义迭代器
+    iterator = Iterator.from_structure(tr_data.data.output_types,
                                    tr_data.data.output_shapes)
-# 定义每次迭代的数据
-next_batch = iterator.get_next()
+    # 定义每次迭代的数据
+    next_batch = iterator.get_next()
 
-training_initalize=iterator.make_initializer(tr_data.data)
-testing_initalize=iterator.make_initializer(test_data.data)
+    training_initalize=iterator.make_initializer(tr_data.data)
+    testing_initalize=iterator.make_initializer(test_data.data)
 
 x = tf.placeholder(tf.float32, [batch_size, 227, 227, 3])
 y = tf.placeholder(tf.float32, [batch_size, num_classes])
@@ -97,20 +97,21 @@ var_list = [v for v in tf.trainable_variables() if v.name.split('/')[0] in train
 # 执行整个网络图
 score = model.fc8
 
-# 损失函数
-loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=score,
+with tf.name_scope('cross_entropy'):
+    # 损失函数
+    loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=score,
                                                               labels=y))
 
 gradients = tf.gradients(loss, var_list)
 
 gradients = list(zip(gradients, var_list))
 
-# 优化器，采用梯度下降算法进行优化
-optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+with tf.name_scope('optimizer'):
+    # 优化器，采用梯度下降算法进行优化
+    optimizer = tf.train.GradientDescentOptimizer(learning_rate)
+    train_op = optimizer.apply_gradients(grads_and_vars=gradients)
 
-train_op = optimizer.apply_gradients(grads_and_vars=gradients)
 
-tf.summary.scalar('cross_entropy', loss)
 
 # 定义网络精确度
 with tf.name_scope("accuracy"):
@@ -118,6 +119,7 @@ with tf.name_scope("accuracy"):
     accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
 # 把精确度加入到Tensorboard
+tf.summary.scalar('cross_entropy', loss)
 tf.summary.scalar('accuracy', accuracy)
 merged_summary = tf.summary.merge_all()
 writer = tf.summary.FileWriter(filewriter_path)
