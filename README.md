@@ -27,7 +27,8 @@
 * finetune.py is aimed to tune the weights and bias in the full connected layer, you must define some varibles,functions,and class numbers according to your distinct projects.  
 
 ## Example output:
-We choosed ten pictures from the internet to validate the AlexNet, there were three pictures being misidentified, the accuracy is about 70%, which is similar to the accuracy we tested before. See the results below:
+We choosed ten pictures from the internet to validate the AlexNet, there were three pictures being misidentified, the accuracy is about 70%, which is similar to the accuracy we tested before. But, On the whole, the AlexNet is not as good as we expected before, the reason may have something to do with the datesets. If you have more than One hundred thousand dataset, the accuracy must be better than we trained.
+See the results below:
 
 ![2017-10-18-10-16-50](http://qiniu.xdpie.com/2017-10-18-10-16-50.png)
 
