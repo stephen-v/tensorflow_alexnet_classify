@@ -28,6 +28,7 @@
 
 ## Example output:
 We choosed ten pictures from the internet to validate the AlexNet, there were three pictures being misidentified, the accuracy is about 70%, which is similar to the accuracy we tested before. See the results below:
+
 ![2017-10-18-10-16-50](http://qiniu.xdpie.com/2017-10-18-10-16-50.png)
 
 ![2017-10-18-10-18-37](http://qiniu.xdpie.com/2017-10-18-10-18-37.png)
