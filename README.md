@@ -4,7 +4,7 @@
 > We built this AlexNet in Windows with no 3G GPU,  it's very convenient for most of you to train the net.
 
 ## Requirements
-* Python 3.5 (Didn't test but should run under 2.7 as well)
+* Python 3.5
 * TensorFlow 1.0
 * Numpy
 * cat and dog images [here](https://www.kaggle.com/c/dogs-vs-cats-redux-kernels-edition/data)
