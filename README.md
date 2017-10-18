@@ -24,7 +24,7 @@
 
 ## Notes:
 * The alexnet.py and datagenerator.py files have been builded, you don't have to modify it. But if you have more concise or effective codes, please do share them with us.
-* finetune.py is aimed to tune the weights and bias in the full connected layer, you must define some varibles,functions,and class numbers according to your distinct projects.  
+* finetune.py is aimed to tune the weights and bias in the full connected layer, you must define some varibles,functions,and class numbers according to your own classification projects.  
 
 ## Example output:
 We choosed ten pictures from the internet to validate the AlexNet, there were three being misidentified, the accuracy is about 70%, which is similar to the accuracy we tested before. But, On the whole, the AlexNet is not as good as we expected before, the reason may have something to do with the datesets. If you have more than One hundred thousand dataset, the accuracy must be better than we trained.
