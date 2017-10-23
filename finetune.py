@@ -29,48 +29,40 @@ train_image_path = 'train/'  # 指定训练集数据路径（根据实际情况�
 test_image_cat_path = 'test/cat/'  # 指定测试集数据路径（根据实际情况指定测试数据集的路径）
 test_image_dog_path = 'test/dog/'  # 指定测试集数据路径（根据实际情况指定测试数据集的路径）
 
-# 打开训练数据集目录，读取全部图片，生成图片路径列表
-image_filenames_cat = np.array(glob.glob(train_image_path + 'cat.*.jpg'))
-image_filenames_dog = np.array(glob.glob(train_image_path + 'dog.*.jpg'))
-
-# 打开测试数据集目录，读取全部图片，生成图片路径列表
-test_image_filenames_cat = np.array(glob.glob(test_image_cat_path + '*.jpg'))
-test_image_filenames_dog = np.array(glob.glob(test_image_dog_path + '*.jpg'))
-
-image_path = []
 label_path = []
-test_image = []
 test_label = []
 
-# 遍历训练集图片URL，并把图片对应的实际标签和路径分别存入两个新列表中
-for catitem in image_filenames_cat:
-    image_path.append(catitem)
-    label_path.append(0)
-for dogitem in image_filenames_dog:
-    image_path.append(dogitem)
-    label_path.append(1)
+# 打开训练数据集目录，读取全部图片，生成图片路径列表
+image_path = np.array(glob.glob(train_image_path + 'cat.*.jpg')).tolist()
+image_path_dog = np.array(glob.glob(train_image_path + 'dog.*.jpg')).tolist()
+image_path[len(image_path):len(image_path)] = image_path_dog
+for i in range(len(image_path)):
+    if 'dog' in image_path[i]:
+        label_path.append(1)
+    else:
+        label_path.append(0)
 
-# 遍历测试集图片URL，并把图片路径存入一个新列表中
-for catitem in test_image_filenames_cat:
-    test_image.append(catitem)
-    test_label.append(0)
-
-for dogitem in test_image_filenames_cat:
-    test_image.append(dogitem)
-    test_label.append(1)
-
+# 打开测试数据集目录，读取全部图片，生成图片路径列表
+test_image = np.array(glob.glob(test_image_cat_path + '*.jpg')).tolist()
+test_image_path_dog = np.array(glob.glob(test_image_dog_path + '*.jpg')).tolist()
+test_image[len(test_image):len(test_image)] = test_image_path_dog
+for i in range(len(test_image)):
+    if i < 1500:
+        test_label.append(0)
+    else:
+        test_label.append(1)
 
 # 调用图片生成器，把训练集图片转换成三维数组
 tr_data = ImageDataGenerator(
-    images=image_path,
-    labels=label_path,
+    images=image_path1,
+    labels=label_path1,
     batch_size=batch_size,
     num_classes=num_classes)
 
 # 调用图片生成器，把测试集图片转换成三维数组
 test_data = ImageDataGenerator(
-    images=test_image,
-    labels=test_label,
+    images=test_image1,
+    labels=test_label1,
     batch_size=batch_size,
     num_classes=num_classes,
     shuffle=False)
@@ -78,11 +70,12 @@ with tf.name_scope('input'):
     # 定义迭代器
     iterator = Iterator.from_structure(tr_data.data.output_types,
                                    tr_data.data.output_shapes)
-    # 定义每次迭代的数据
-    next_batch = iterator.get_next()
 
     training_initalize=iterator.make_initializer(tr_data.data)
     testing_initalize=iterator.make_initializer(test_data.data)
+
+    # 定义每次迭代的数据
+    next_batch = iterator.get_next()
 
 x = tf.placeholder(tf.float32, [batch_size, 227, 227, 3])
 y = tf.placeholder(tf.float32, [batch_size, num_classes])
@@ -97,7 +90,7 @@ var_list = [v for v in tf.trainable_variables() if v.name.split('/')[0] in train
 # 执行整个网络图
 score = model.fc8
 
-with tf.name_scope('cross_entropy'):
+with tf.name_scope('loss'):
     # 损失函数
     loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=score,
                                                               labels=y))
@@ -119,7 +112,7 @@ with tf.name_scope("accuracy"):
     accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
 
 # 把精确度加入到Tensorboard
-tf.summary.scalar('cross_entropy', loss)
+tf.summary.scalar('loss', loss)
 tf.summary.scalar('accuracy', accuracy)
 merged_summary = tf.summary.merge_all()
 writer = tf.summary.FileWriter(filewriter_path)
