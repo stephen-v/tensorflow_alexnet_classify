@@ -54,15 +54,15 @@ for i in range(len(test_image)):
 
 # 调用图片生成器，把训练集图片转换成三维数组
 tr_data = ImageDataGenerator(
-    images=image_path1,
-    labels=label_path1,
+    images=image_path,
+    labels=label_path,
     batch_size=batch_size,
     num_classes=num_classes)
 
 # 调用图片生成器，把测试集图片转换成三维数组
 test_data = ImageDataGenerator(
-    images=test_image1,
-    labels=test_label1,
+    images=test_image,
+    labels=test_label,
     batch_size=batch_size,
     num_classes=num_classes,
     shuffle=False)
