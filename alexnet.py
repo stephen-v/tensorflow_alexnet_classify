@@ -148,7 +148,6 @@ def fc(x, num_in, num_out, name, relu=True):
         weights = tf.get_variable('weights', shape=[num_in, num_out],
                                   trainable=True)
         biases = tf.get_variable('biases', [num_out], trainable=True)
-
         # Matrix multiply weights and inputs and add bias
         act = tf.nn.xw_plus_b(x, weights, biases, name=scope.name)
 

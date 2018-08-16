@@ -57,7 +57,8 @@ tr_data = ImageDataGenerator(
     images=image_path,
     labels=label_path,
     batch_size=batch_size,
-    num_classes=num_classes)
+    num_classes=num_classes,
+    shuffle=False)
 
 # 调用图片生成器，把测试集图片转换成三维数组
 test_data = ImageDataGenerator(

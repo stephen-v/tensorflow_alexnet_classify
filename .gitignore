@@ -4,3 +4,4 @@
 test/
 tmp/
 train/
+validate/
