@@ -3,7 +3,7 @@ import numpy as np
 
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework.ops import convert_to_tensor
-from tensorflow.contrib.data import Dataset
+from tensorflow.data import Dataset
 
 VGG_MEAN = tf.constant([123.68, 116.779, 103.939], dtype=tf.float32)
 
@@ -24,8 +24,7 @@ class ImageDataGenerator(object):
         self.img_paths = convert_to_tensor(self.img_paths, dtype=dtypes.string)
         self.labels = convert_to_tensor(self.labels, dtype=dtypes.int32)
         data = Dataset.from_tensor_slices((self.img_paths, self.labels))
-        data = data.map(self._parse_function_train, num_threads=8,
-                        output_buffer_size=100 * batch_size)
+        data = data.map(self._parse_function_train)
 
         data = data.batch(batch_size)
 

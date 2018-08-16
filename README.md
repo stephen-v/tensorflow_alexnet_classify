@@ -5,7 +5,7 @@
 
 ## Requirements
 * Python 3.5
-* TensorFlow 1.0
+* TensorFlow 1.8.0
 * Numpy
 * cat and dog images [here](https://www.kaggle.com/c/dogs-vs-cats-redux-kernels-edition/data)
 

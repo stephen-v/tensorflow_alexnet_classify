@@ -9,15 +9,15 @@ from alexnet import AlexNet
 from datagenerator import ImageDataGenerator
 from datetime import datetime
 import glob
-from tensorflow.contrib.data import Iterator
+from tensorflow.data import Iterator
 
 learning_rate = 1e-4
-num_epochs = 100  # 代的个数
-batch_size = 1024
+num_epochs = 10  # 代的个数
+batch_size = 100
 dropout_rate = 0.5
 num_classes = 2  # 类别标签
 train_layers = ['fc8', 'fc7', 'fc6']
-display_step = 20
+display_step = 2
 
 filewriter_path = "./tmp/tensorboard"  # 存储tensorboard文件
 checkpoint_path = "./tmp/checkpoints"  # 训练好的模型和参数存放目录
