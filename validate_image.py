@@ -16,7 +16,7 @@ def test_image(path_image, num_class, weights_path='Default'):
     saver = tf.train.Saver()
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        saver.restore(sess, "./tmp/checkpoints/model_epoch1.ckpt")
+        saver.restore(sess, "./tmp/checkpoints/model_epoch10.ckpt")
         # score = model.fc8
         print(sess.run(model.fc8))
         prob = sess.run(max)[0]
@@ -25,4 +25,4 @@ def test_image(path_image, num_class, weights_path='Default'):
         plt.show()
 
 
-test_image('./validate/cat.503.jpg', num_class=2)
+test_image('./validate/dog.503.jpg', num_class=2)
