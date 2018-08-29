@@ -24,4 +24,4 @@ def test_image(path_image, num_class):
         plt.show()
 
 
-test_image('./validate/cat.503.jpg', num_class=2)
+test_image('G:/信抗实验室/Data_sets/catanddog/validate/cat.503.jpg', num_class=2)

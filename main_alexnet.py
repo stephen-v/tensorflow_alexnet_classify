@@ -24,9 +24,9 @@ from tensorflow.data import Iterator
 
 def main():
     # 初始参数设置
-    learning_rate = 1e-4
-    num_epochs = 3  # 代的个数 之前是100
-    batch_size = 50 # 之前是1024
+    learning_rate = 1e-3
+    num_epochs = 30  # 代的个数 之前是100
+    batch_size = 100 # 之前是1024
     dropout_rate = 0.5
     num_classes = 2  # 类别标签
     display_step = 2 # display_step个batch_size训练完了就在tensorboard中写入loss和accuracy
@@ -111,7 +111,7 @@ def main():
 
     # loss
     with tf.name_scope('loss'):    
-        loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=fc8,
+        loss_op = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=fc8,
                                                                   labels=y))
     # optimizer
     with tf.name_scope('optimizer'):      
@@ -141,7 +141,7 @@ def main():
     # 开始训练
     with tf.Session() as sess:
         sess.run(init)
-
+        saver.restore(sess, "./tmp/checkpoints/model_epoch1.ckpt")
         # Tensorboard
         writer.add_graph(sess.graph)
 
@@ -156,15 +156,19 @@ def main():
             # train
             for step in range(train_batches_per_epoch):
                 img_batch, label_batch = sess.run(next_batch)
-                sess.run(train_op, feed_dict={x: img_batch,
+                loss,_ = sess.run([loss_op,train_op], feed_dict={x: img_batch,
                                                y: label_batch,
                                                keep_prob: dropout_rate})
                 if step % display_step == 0:
+                    # loss
+                    print("{} loss = {}".format(datetime.now(), loss))
+
+                    # Tensorboard
                     s = sess.run(merged_summary, feed_dict={x: img_batch,
                                                             y: label_batch,
                                                             keep_prob: 1.})
                     writer.add_summary(s, epoch * train_batches_per_epoch + step)
-
+  
             # accuracy
             print("{} Start validation".format(datetime.now()))
             sess.run(testing_initalizer)
