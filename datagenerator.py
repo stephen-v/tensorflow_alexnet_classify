@@ -7,27 +7,26 @@ from tensorflow.data import Dataset
 
 VGG_MEAN = tf.constant([123.68, 116.779, 103.939], dtype=tf.float32)
 
-
 # 把图片数据转化为三维矩阵
 class ImageDataGenerator(object):
-    def __init__(self, images, labels, batch_size, num_classes, shuffle=True):
-
-        self.img_paths = images
-        self.labels = labels
+    def __init__(self, images, labels, batch_size, num_classes, image_format='jpg', shuffle=True):
+        self.img_paths = images # [P1,P2]
+        self.labels = labels # [1,2]
+        self.data_size = len(self.labels)        
         self.num_classes = num_classes
-        self.data_size = len(self.labels)
-        self.pointer = 0
+        self.image_format = image_format
 
         if shuffle:
             self._shuffle_lists()
 
         self.img_paths = convert_to_tensor(self.img_paths, dtype=dtypes.string)
         self.labels = convert_to_tensor(self.labels, dtype=dtypes.int32)
-        data = Dataset.from_tensor_slices((self.img_paths, self.labels))
+        data = tf.data.Dataset.from_tensor_slices((self.img_paths, self.labels))
+        '''Dataset.from_tensor_slices((self.img_paths, self.labels))'''
         data = data.map(self._parse_function_train)
-
+        '''data.map(self._parse_function_train, num_threads=8,
+                    output_buffer_size=100 * batch_size)'''
         data = data.batch(batch_size)
-
         self.data = data
 
     # 打乱图片顺序
@@ -45,7 +44,12 @@ class ImageDataGenerator(object):
     def _parse_function_train(self, filename, label):
         one_hot = tf.one_hot(label, self.num_classes)
         img_string = tf.read_file(filename)
-        img_decoded = tf.image.decode_png(img_string, channels=3)
+        if self.image_format == "jpg": # 增加图片类别区分
+            img_decoded = tf.image.decode_jpeg(img_string, channels=3)
+        elif self.image_format == "png":
+            img_decoded = tf.image.decode_png(img_string, channels=3)
+        else:
+            print("Error! Can't confirm the format of images!")
         img_resized = tf.image.resize_images(img_decoded, [227, 227])
         img_centered = tf.subtract(img_resized, VGG_MEAN)
         img_bgr = img_centered[:, :, ::-1]
