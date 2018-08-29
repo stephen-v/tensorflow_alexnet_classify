@@ -41,6 +41,7 @@ def main():
                            'G:/信抗实验室/Data_sets/catanddog/train/dog/'] # 指定训练集数据路径（根据实际情况指定训练数据集的路径）
     test_dataset_paths = ['G:/信抗实验室/Data_sets/catanddog/test/cat/',
                           'G:/信抗实验室/Data_sets/catanddog/test/dog/'] # 指定测试集数据路径（根据实际情况指定测试数据集的路径）
+    # 注意：默认数据集中的样本文件名称中包含其所属类别标签的名称，即file_name_of_class中的名称
     # 初始参数设置完毕
         
 
