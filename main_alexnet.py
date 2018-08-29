@@ -15,8 +15,6 @@
 import os
 import numpy as np
 import tensorflow as tf
-#import tensorflow.contrib.eager as tfe
-#tfe.enable_eager_execution()
 from thisalexnet import alexnet
 from datagenerator import ImageDataGenerator
 from datetime import datetime
@@ -136,46 +134,41 @@ def main():
     saver = tf.train.Saver()
 
     # 定义一代的迭代次数
-    train_batches_per_epoch = int(np.floor(tr_data.data_size / batch_size))
+    train_batches_per_epoch = int(np.floor(train_data.data_size / batch_size))
     test_batches_per_epoch = int(np.floor(test_data.data_size / batch_size))
 
     # 开始训练
     with tf.Session() as sess:
         sess.run(init)
 
-        # 把模型图加入Tensorboard
+        # Tensorboard
         writer.add_graph(sess.graph)
 
         print("{} Start training...".format(datetime.now()))
         print("{} Open Tensorboard at --logdir {}".format(datetime.now(),
                                                           filewriter_path))
 
-        # 总共训练10代
         for epoch in range(num_epochs):
-            sess.run(training_initalize)
+            sess.run(training_initalizer)
             print("{} Epoch number: {} start".format(datetime.now(), epoch + 1))
 
-            #开始训练每一代
+            # train
             for step in range(train_batches_per_epoch):
                 img_batch, label_batch = sess.run(next_batch)
-                print('label_batch',sess.run(label_batch))
                 sess.run(train_op, feed_dict={x: img_batch,
                                                y: label_batch,
                                                keep_prob: dropout_rate})
                 if step % display_step == 0:
-                    print('asdad')
                     s = sess.run(merged_summary, feed_dict={x: img_batch,
                                                             y: label_batch,
                                                             keep_prob: 1.})
-
                     writer.add_summary(s, epoch * train_batches_per_epoch + step)
 
-            # 测试模型精确度
+            # accuracy
             print("{} Start validation".format(datetime.now()))
-            sess.run(testing_initalize)
+            sess.run(testing_initalizer)
             test_acc = 0.
             test_count = 0
-
             for _ in range(test_batches_per_epoch):
                 img_batch, label_batch = sess.run(next_batch)
                 acc = sess.run(accuracy, feed_dict={x: img_batch,
@@ -183,14 +176,11 @@ def main():
                                                     keep_prob: 1.0})
                 test_acc += acc
                 test_count += 1
-
             test_acc /= test_count
-
             print("{} Validation Accuracy = {:.4f}".format(datetime.now(), test_acc))
 
-            # 把训练好的模型存储起来
+            # save model
             print("{} Saving checkpoint of model...".format(datetime.now()))
-
             checkpoint_name = os.path.join(checkpoint_path, 'model_epoch' + str(epoch + 1) + '.ckpt')
             save_path = saver.save(sess, checkpoint_name)
 
