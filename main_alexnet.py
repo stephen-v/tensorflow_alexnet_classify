@@ -24,13 +24,14 @@ from tensorflow.data import Iterator
 
 def main():
     # 初始参数设置
-    learning_rate = 1e-3
-    num_epochs = 30  # 代的个数 之前是100
-    batch_size = 100 # 之前是1024
+    learning_rate = 1e-4
+    num_epochs = 20  # 代的个数 之前是10
+    train_batch_size = 1000 # 之前是1024
+    test_batch_size = 100
     dropout_rate = 0.5
     num_classes = 2  # 类别标签
-    display_step = 2 # display_step个batch_size训练完了就在tensorboard中写入loss和accuracy
-                     # need: display_step <= train_dataset_size / batch_size
+    display_step = 2 # display_step个train_batch_size训练完了就在tensorboard中写入loss和accuracy
+                     # need: display_step <= train_dataset_size / train_batch_size
 
     filewriter_path = "./tmp/tensorboard"  # 存储tensorboard文件
     checkpoint_path = "./tmp/checkpoints"  # 训练好的模型和参数存放目录
@@ -78,7 +79,7 @@ def main():
     train_data = ImageDataGenerator(
         images=train_image_paths,
         labels=train_labels,
-        batch_size=batch_size,
+        batch_size=train_batch_size,
         num_classes=num_classes,
         image_format=image_format,
         shuffle=True)
@@ -87,7 +88,7 @@ def main():
     test_data = ImageDataGenerator(
         images=test_image_paths,
         labels=test_labels,
-        batch_size=batch_size,
+        batch_size=test_batch_size,
         num_classes=num_classes,
         image_format=image_format,
         shuffle=False)
@@ -95,15 +96,18 @@ def main():
     # get Iterators
     with tf.name_scope('input'):
         # 定义迭代器
-        iterator = Iterator.from_structure(train_data.data.output_types,
-                                       train_data.data.output_shapes)
-        training_initalizer=iterator.make_initializer(train_data.data)
-        testing_initalizer=iterator.make_initializer(test_data.data)
+        train_iterator = Iterator.from_structure(train_data.data.output_types,
+                                        train_data.data.output_shapes)
+        training_initalizer=train_iterator.make_initializer(train_data.data)
+        test_iterator = Iterator.from_structure(test_data.data.output_types,
+                                        test_data.data.output_shapes)
+        testing_initalizer=test_iterator.make_initializer(test_data.data)
         # 定义每次迭代的数据
-        next_batch = iterator.get_next()
+        train_next_batch = train_iterator.get_next()
+        test_next_batch = test_iterator.get_next()
 
-    x = tf.placeholder(tf.float32, [batch_size, 227, 227, 3])
-    y = tf.placeholder(tf.float32, [batch_size, num_classes])
+    x = tf.placeholder(tf.float32, [None, 227, 227, 3])
+    y = tf.placeholder(tf.float32, [None, num_classes])
     keep_prob = tf.placeholder(tf.float32)
 
     # 图片数据通过AlexNet网络处理
@@ -135,33 +139,33 @@ def main():
     saver = tf.train.Saver()
 
     # 定义一代的迭代次数
-    train_batches_per_epoch = int(np.floor(train_data.data_size / batch_size))
-    test_batches_per_epoch = int(np.floor(test_data.data_size / batch_size))
+    train_batches_per_epoch = int(np.floor(train_data.data_size / train_batch_size))
+    test_batches_per_epoch = int(np.floor(test_data.data_size / test_batch_size))
 
     # 开始训练
     with tf.Session() as sess:
         sess.run(init)
-        saver.restore(sess, "./tmp/checkpoints/model_epoch1.ckpt")
+        #saver.restore(sess, "./tmp/checkpoints/model_epoch6.ckpt")
         # Tensorboard
         writer.add_graph(sess.graph)
 
-        print("{} Start training...".format(datetime.now()))
-        print("{} Open Tensorboard at --logdir {}".format(datetime.now(),
+        print("{}: Start training...".format(datetime.now()))
+        print("{}: Open Tensorboard at --logdir {}".format(datetime.now(),
                                                           filewriter_path))
 
         for epoch in range(num_epochs):
             sess.run(training_initalizer)
-            print("{} Epoch number: {} start".format(datetime.now(), epoch + 1))
+            print("{}: Epoch number: {} start".format(datetime.now(), epoch + 1))
 
             # train
             for step in range(train_batches_per_epoch):
-                img_batch, label_batch = sess.run(next_batch)
+                img_batch, label_batch = sess.run(train_next_batch)
                 loss,_ = sess.run([loss_op,train_op], feed_dict={x: img_batch,
                                                y: label_batch,
                                                keep_prob: dropout_rate})
                 if step % display_step == 0:
                     # loss
-                    print("{} loss = {}".format(datetime.now(), loss))
+                    print("{}: loss = {}".format(datetime.now(), loss))
 
                     # Tensorboard
                     s = sess.run(merged_summary, feed_dict={x: img_batch,
@@ -170,26 +174,29 @@ def main():
                     writer.add_summary(s, epoch * train_batches_per_epoch + step)
   
             # accuracy
-            print("{} Start validation".format(datetime.now()))
+            print("{}: Start validation".format(datetime.now()))
             sess.run(testing_initalizer)
             test_acc = 0.
             test_count = 0
             for _ in range(test_batches_per_epoch):
-                img_batch, label_batch = sess.run(next_batch)
+                img_batch, label_batch = sess.run(test_next_batch)
                 acc = sess.run(accuracy, feed_dict={x: img_batch,
                                                     y: label_batch,
                                                     keep_prob: 1.0})
                 test_acc += acc
                 test_count += 1
-            test_acc /= test_count
-            print("{} Validation Accuracy = {:.4f}".format(datetime.now(), test_acc))
+            try:
+                test_acc /= test_count
+            except:
+                print('除数不能为零!')
+            print("{}: Validation Accuracy = {:.4f}".format(datetime.now(), test_acc))
 
             # save model
-            print("{} Saving checkpoint of model...".format(datetime.now()))
+            print("{}: Saving checkpoint of model...".format(datetime.now()))
             checkpoint_name = os.path.join(checkpoint_path, 'model_epoch' + str(epoch + 1) + '.ckpt')
             save_path = saver.save(sess, checkpoint_name)
 
-            print("{} Epoch number: {} end".format(datetime.now(), epoch + 1))
+            print("{}: Epoch number: {} end".format(datetime.now(), epoch + 1))
 
 
 if __name__ == '__main__':
