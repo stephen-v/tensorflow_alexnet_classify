@@ -12,7 +12,7 @@
 ## Usage 
 1.  Make sure that you have already changed file directory to the right format.
 
-    **example:**
+    example:
     
     /path/to/train/cat/cat_1.jpg
 
@@ -28,7 +28,7 @@
     
 2.  Modify parameters of the beginning of main function in the main_alexnet.py file.
 
-    **example:**
+    example:
 
 '''
 
