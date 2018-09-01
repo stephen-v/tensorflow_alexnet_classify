@@ -15,7 +15,7 @@
 import os
 import numpy as np
 import tensorflow as tf
-from thisalexnet import alexnet
+from alexnet import alexnet
 from datagenerator import ImageDataGenerator
 from datetime import datetime
 import glob
@@ -24,8 +24,8 @@ from tensorflow.data import Iterator
 
 def main():
     # 初始参数设置
-    learning_rate = 1e-4
-    num_epochs = 20  # 代的个数 之前是10
+    learning_rate = 1e-3
+    num_epochs = 17  # 代的个数 之前是10
     train_batch_size = 1000 # 之前是1024
     test_batch_size = 100
     dropout_rate = 0.5
@@ -37,11 +37,12 @@ def main():
     checkpoint_path = "./tmp/checkpoints"  # 训练好的模型和参数存放目录
 
     image_format = 'jpg' # 数据集的数据类型
-    file_name_of_class = ['cat','dog'] # cat对应标签0,dog对应标签1。默认图片包含独特的名词，比如类别
-    train_dataset_paths = ['G:/信抗实验室/Data_sets/catanddog/train/cat/', 
-                           'G:/信抗实验室/Data_sets/catanddog/train/dog/'] # 指定训练集数据路径（根据实际情况指定训练数据集的路径）
-    test_dataset_paths = ['G:/信抗实验室/Data_sets/catanddog/test/cat/',
-                          'G:/信抗实验室/Data_sets/catanddog/test/dog/'] # 指定测试集数据路径（根据实际情况指定测试数据集的路径）
+    file_name_of_class = ['cat',
+                          'dog'] # cat对应标签0,dog对应标签1。默认图片包含独特的名词，比如类别
+    train_dataset_paths = ['G:/Lab/Data_sets/catanddog/train/cat/', 
+                           'G:/Lab/Data_sets/catanddog/train/dog/'] # 指定训练集数据路径（根据实际情况指定训练数据集的路径）
+    test_dataset_paths = ['G:/Lab/Data_sets/catanddog/test/cat/',
+                          'G:/Lab/Data_sets/catanddog/test/dog/'] # 指定测试集数据路径（根据实际情况指定测试数据集的路径）
     # 注意：默认数据集中的样本文件名称中包含其所属类别标签的名称，即file_name_of_class中的名称
     # 初始参数设置完毕
         
@@ -110,7 +111,7 @@ def main():
     y = tf.placeholder(tf.float32, [None, num_classes])
     keep_prob = tf.placeholder(tf.float32)
 
-    # 图片数据通过AlexNet网络处理
+    # alexnet
     fc8 = alexnet(x, keep_prob, num_classes)
 
     # loss
@@ -129,7 +130,7 @@ def main():
 
     init = tf.global_variables_initializer()
 
-    # 把精确度加入到Tensorboard
+    # Tensorboard
     tf.summary.scalar('loss', loss_op)
     tf.summary.scalar('accuracy', accuracy)
     merged_summary = tf.summary.merge_all()
@@ -142,10 +143,10 @@ def main():
     train_batches_per_epoch = int(np.floor(train_data.data_size / train_batch_size))
     test_batches_per_epoch = int(np.floor(test_data.data_size / test_batch_size))
 
-    # 开始训练
+    # Start training
     with tf.Session() as sess:
         sess.run(init)
-        #saver.restore(sess, "./tmp/checkpoints/model_epoch6.ckpt")
+        #saver.restore(sess, "./tmp/checkpoints/model_epoch18.ckpt")
         # Tensorboard
         writer.add_graph(sess.graph)
 
@@ -188,7 +189,7 @@ def main():
             try:
                 test_acc /= test_count
             except:
-                print('除数不能为零!')
+                print('ZeroDivisionError!')
             print("{}: Validation Accuracy = {:.4f}".format(datetime.now(), test_acc))
 
             # save model
@@ -196,6 +197,7 @@ def main():
             checkpoint_name = os.path.join(checkpoint_path, 'model_epoch' + str(epoch + 1) + '.ckpt')
             save_path = saver.save(sess, checkpoint_name)
 
+            # this epoch is over
             print("{}: Epoch number: {} end".format(datetime.now(), epoch + 1))
 
 

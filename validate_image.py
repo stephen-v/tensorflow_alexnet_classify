@@ -1,9 +1,8 @@
 import tensorflow as tf
-from thisalexnet import alexnet
+from alexnet import alexnet
 import matplotlib.pyplot as plt
 
 class_name = ['cat', 'dog']
-
 
 def test_image(path_image, num_class):
     img_string = tf.read_file(path_image)
@@ -16,7 +15,7 @@ def test_image(path_image, num_class):
     saver = tf.train.Saver()
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
-        saver.restore(sess, "./tmp/checkpoints/model_epoch1.ckpt")
+        saver.restore(sess, "./tmp/checkpoints/model_epoch18.ckpt")
         print(sess.run(fc8))
         prob = sess.run(max)[0]
         plt.imshow(img_decoded.eval())
@@ -24,4 +23,4 @@ def test_image(path_image, num_class):
         plt.show()
 
 
-test_image('G:/信抗实验室/Data_sets/catanddog/validate/cat.503.jpg', num_class=2)
+test_image('G:/Lab/Data_sets/catanddog/validate/dog.504.jpg', num_class=2)
