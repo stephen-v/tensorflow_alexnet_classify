@@ -10,10 +10,11 @@
 * cat and dog images [here](https://www.kaggle.com/c/dogs-vs-cats-redux-kernels-edition/data)
 
 ## Usage 
-1.  Make sure that you have already changed file directory to the right format.
+1'  Make sure that you have already changed file directory to the right format.
 
-    example:
-    
+**example:**
+
+
     /path/to/train/cat/cat_1.jpg
 
     /path/to/train/cat/cat_2.jpg
@@ -25,33 +26,35 @@
 	/path/to/test/cat/cat_1.jpg
 
     /path/to/test/dog/dog_1.jpg
+
+
+
     
-2.  Modify parameters of the beginning of main function in the main_alexnet.py file.
+2'  Modify parameters of the beginning of main function in the main_alexnet.py file.
 
-    example:
+**example:**
 
-'''
 
-    learning_rate = 1e-3
-    num_epochs = 17  
-    train_batch_size = 1000 
-    test_batch_size = 100
-    dropout_rate = 0.5
-    num_classes = 2  
-    display_step = 2 
+	learning_rate = 1e-3
+	num_epochs = 17  
+	train_batch_size = 1000 
+	test_batch_size = 100
+	dropout_rate = 0.5
+	num_classes = 2  
+	display_step = 2 
+	
+	filewriter_path = "./tmp/tensorboard" 
+	checkpoint_path = "./tmp/checkpoints"  
+	
+	image_format = 'jpg' 
+	file_name_of_class = ['cat',
+	                      'dog']
+	train_dataset_paths = ['G:/Lab/Data_sets/catanddog/train/cat/', 
+	                       'G:/Lab/Data_sets/catanddog/train/dog/'] 
+	test_dataset_paths = ['G:/Lab/Data_sets/catanddog/test/cat/',
+	                      'G:/Lab/Data_sets/catanddog/test/dog/'] 
 
-    filewriter_path = "./tmp/tensorboard" 
-    checkpoint_path = "./tmp/checkpoints"  
 
-    image_format = 'jpg' 
-    file_name_of_class = ['cat',
-                          'dog']
-    train_dataset_paths = ['G:/Lab/Data_sets/catanddog/train/cat/', 
-                           'G:/Lab/Data_sets/catanddog/train/dog/'] 
-    test_dataset_paths = ['G:/Lab/Data_sets/catanddog/test/cat/',
-                          'G:/Lab/Data_sets/catanddog/test/dog/'] 
-
-'''
 
 ## Notes:
 * The alexnet.py and datagenerator.py files have been builded, you don't have to modify it. But if you have more concise or effective codes, please do share them with us.
